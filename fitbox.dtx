@@ -1,0 +1,219 @@
+% \iffalse
+% $Id$
+%
+%% Copyright 2015, Boris Veytsman <borisv@lk.net
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either
+%% version 1.3 of this license or (at your option) any 
+%% later version.
+%% The latest version of the license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of
+%% LaTeX version 2003/06/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The Current Maintainer of this work is Boris Veytsman
+%%
+%    \begin{macrocode}
+%<style>\NeedsTeXFormat{LaTeX2e}
+%<*gobble>
+\ProvidesFile{fitbox.dtx}
+%</gobble>
+%<style>\ProvidesPackage{fitbox}
+%<*style>
+[2015/02/02 v1.00 Fitting boxes on a page]
+%    \end{macrocode}
+%</style>
+%<*gobble>
+% \fi
+% \CheckSum{0}
+%
+%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~} 
+%
+%\iffalse
+%    \begin{macrocode}
+\documentclass{ltxdoc}
+\usepackage{hypdoc}
+\PageIndex
+\CodelineIndex
+\RecordChanges
+\EnableCrossrefs
+\begin{document}
+  \DocInput{fitbox.dtx}
+\end{document}
+%    \end{macrocode}
+%</gobble> 
+% \fi
+% \MakeShortVerb{|}
+% \GetFileInfo{fitbox.dtx}
+% 
+% 
+% \title{Fit Box Package\thanks{\copyright 2015 Boris Veytsman}
+% \thanks{This package was commissined by Neadwerx, \url{http://www.neadwerx.com/}}}
+% \author{Boris Veytsman \thanks{borisv@lk.net}}
+% \date{\filedate, \fileversion}
+% \maketitle
+%
+% \begin{abstract}
+%   The \textsl{fitbox} package allows a box (usually an
+%   |\includegraphics| box to be fit on the page.  It scales the box
+%   to the maximal allowed size within the user-set limits. If there
+%   there is not enough space on the page, the box is moved to the
+%   next one.
+% \end{abstract}
+%
+% \tableofcontents
+%
+% \clearpage
+%
+%\section{Introduction}
+%\label{sec:intro}
+% 
+% How often one puts a picture on a page only to see that \LaTeX\
+% decides to move it to the next one because there is not enough
+% space---while shaving a millimeter off the height would make the
+% difference?  This package is intended to alleviate this difference.
+% It uses several strategies to fit a picture on the page, and only if
+% they fail, the picture is moved to the next one.
+%
+%\section{User Guide}
+%\label{sec:ug}
+%
+%
+%\subsection{Installation}
+%\label{sec:ug_install}
+%
+% The installation of the class follows the usual
+% practice~\cite{TeXFAQ} for \LaTeX{} packages:
+% \begin{enumerate}
+% \item Run \textsf{latex} on |fitbox.ins|.  This will produce the file
+% |fitbox.sty|.
+% \item Put the file |fitbox.sty| to
+% the place where \LaTeX{} can find it (see
+% \cite{TeXFAQ} or the documentation for your \TeX{}
+% system).\label{item:install}
+% \item Update the database of file names.  Again, see \cite{TeXFAQ}
+% or the documentation for your \TeX{} system for the system-specific
+% details.\label{item:update}
+% \item The file |fitbox.pdf| provides the documentation for the
+%   package
+% \end{enumerate}
+% As an alternative to items~\ref{item:install} and~\ref{item:update}
+% you can just put the files in the working directory where your
+% |.tex| file is.
+% 
+% 
+%
+%\subsection{Usage}
+%\label{sec:usage}
+%
+% To use the package, add to the preamble of your document
+% \begin{verbatim}
+% \usepackage{fitbox}
+% \end{verbatim}
+% 
+% \DescribeMacro{\fitbox}%
+% The main command of the package is
+% \cs{fitbox}\oarg{options}\marg{stuff}.  The \marg{stuff} will be
+% typeset in a box according to the \oarg{options}.  In most cases
+% \marg{stuff} is an \cs{includegraphics} command, but anything that
+% fits into an LR-box can be typeset in this way.
+%
+% The \marg{stuff} is typeset in a box, and then the box is put on the
+% page according to the following algorithm:
+% \begin{enumerate}
+% \item \TeX\ starts a new paragraph.
+% \item The box is scaled up to the maximal dimensions specified by
+% the user (while keeping the aspect ratio).
+% \item If there is not enough space on the page to fit the box, the
+%   latter is scaled down as neccessary, but no smaller than the
+%   minimal dimensions specified by the user.
+% \item If there is still not enough space, \TeX\ tries to enlarge the
+% page up to the specified limit.
+% \item If this also fails, \TeX\ starts a new page and fits the box
+% there.  
+% \end{enumerate}
+% 
+%
+% \DescribeMacro{\fitboxset}%
+% The options can be set individually for each \cs{fitbox} command, or
+% globally using the command \cs{fitboxset}, for example,
+% \begin{verbatim}
+% \fitboxset{maxwidth=\textwidth, minwidth=\fitboxnatwidth}
+% \end{verbatim}
+% 
+%
+% \DescribeMacro{\fitboxnatwidth}%
+% \DescribeMacro{\fitboxnatheight}%
+% The options of the package use key-value interface.  Often
+% the values are dimensions;  in these cases the special dimensions
+% \cs{fitboxnatwidth} and \cs{fitboxnatheight} can be used;  they are
+% equal to natural dimensions of the box.  Note that |height| and
+% \cs{fitboxnatheight} are actually \emph{total heights}, including
+% both height and depth of the corresponding boxes.  For example,
+% \begin{verbatim}
+% \fitboxeset{minheight=0.5\fitboxnatheight}
+% \end{verbatim}
+% means that the box cannot be scaled down more than 50\%.  
+% 
+% The following options are recognized:
+% \begin{description}
+% \item[maxheight:] The maximal total height of the box.  By default
+% \cs{textheight}. 
+% \item[maxwidth:] The maximal width of the box.  By default
+% \cs{textwidth}. 
+% \item[minheight:] The minimal height of the box.  By default
+% \cs{fitboxnatheight}. 
+% \item[minwidth:] The minimal width of the box.  By default
+% \cs{fitboxnatwidth}. 
+% \item[belowboxspace:] The height of the space that must be left
+% below the box (e.g. for a caption).  By default zero.
+% \item[maxenlargepage:] The maximal amount to add to the current
+% page.  By default zero.
+% \end{description}
+% 
+%
+%\StopEventually{\clearpage
+% \bibliography{fitbox}
+% \bibliographystyle{unsrt}}
+%
+% \clearpage
+% 
+% \section{Implementation}
+% \label{sec:implementation}
+% 
+%    \begin{macrocode}
+%<*style>
+%    \end{macrocode}
+%
+%
+%
+%
+%
+%    \begin{macrocode}
+%</style>
+%    \end{macrocode}
+%\Finale
+%\clearpage
+%
+%\PrintChanges
+%\clearpage
+%\PrintIndex
+%
+\endinput
