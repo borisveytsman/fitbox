@@ -3,10 +3,24 @@
 \usepackage{fitbox}
 \begin{document}
 
-\includegraphics{vitruvian}
+%\includegraphics{vitruvian}
+
+\centering
 
 \fitbox{\includegraphics{vitruvian}}
 
+\fitbox[maxheight=400pt, minheight=200pt, belowboxspace=5pt]{\includegraphics{vitruvian}}
 
+\fitbox[maxheight=400pt, minheight=200pt]{\includegraphics{vitruvian}}
+
+\fitbox[maxheight=600pt, minheight=500pt]{\includegraphics{vitruvian}}
+
+\fitbox[maxheight=600pt, minheight=300pt, maxenlargepage=200pt]{\includegraphics{vitruvian}}
+
+\fitbox{\includegraphics{vitruvian}}
+
+\fitbox{\includegraphics{vitruvian}}
+
+\fitbox{\includegraphics{vitruvian}}
 
 \end{document}

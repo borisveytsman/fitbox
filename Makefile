@@ -27,11 +27,11 @@ all:  $(PACKAGE).pdf ${SAMPLES:%.tex=%.pdf}
 	pdflatex $<
 
 %.pdf:  %.tex $(PACKAGE).sty
-	pdflatex $<
-	-bibtex $<
-	pdflatex $<
+	pdflatex $*
+	-bibtex $*
+	pdflatex $*
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $*.log) \
-	do pdflatex $<; done
+	do pdflatex $*; done
 
 
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).sty

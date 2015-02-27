@@ -253,11 +253,102 @@
 %\subsection{Main command}
 %\label{sec:main_command}
 %
+% \begin{macro}{\FTBX@box}
+%   The box which will held the stuff to be typeset
+%    \begin{macrocode}
+\newbox\FTBX@box
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\FTBX@desired@maxheight}
+%   The desired maximal height
+\newdimen\FTBX@desired@maxheight
+% \end{macro}
+%
+%
+% \begin{macro}{\FTBX@desired@minheight}
+%   The desired minimal height
+\newdimen\FTBX@desired@minheight
+% \end{macro}
+%
+% \begin{macro}{\FTBX@available@height}
+%   The desired available height
+\newdimen\FTBX@available@height
+% \end{macro}
+%
 % \begin{macro}{\fitbox}
 %   The main command
 %    \begin{macrocode}
 \newcommand\fitbox[2][]{%
-  \fitboxset{#1}}
+  \fitboxset{#1}%
+  \setbox\FTBX@box=\hbox{#2}%
+  \fitboxnatwidth=\wd\FTBX@box\relax
+  \fitboxnatheight=\ht\FTBX@box\relax
+  \advance\fitboxnatheight by \dp\FTBX@box\relax
+  % Checking the sizes
+  \expandafter\ifdim\cmdKV@FTBX@minwidth>\columnwidth\relax
+      \PackageWarning{fitbox}{Minimal width is larger than page
+        width.  Adjusting...}%
+      \def\cmd@KV@FTBX@minwidth{\columnwidth}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@maxwidth>\columnwidth\relax
+      \PackageWarning{fitbox}{Desired width is larger than page
+        width.  Adjusting...}%
+      \def\cmd@KV@FTBX@maxwidth{\columnwidth}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@minheight>\textheight\relax
+      \PackageWarning{fitbox}{Minimal height is larger than page
+        height.  Adjusting...}%
+      \def\cmd@KV@FTBX@minheight{\textheight}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@maxheight>\textheight\relax
+      \PackageWarning{fitbox}{Desired height is larger than page
+        height.  Adjusting...}%
+      \def\cmd@KV@FTBX@maxheight{\textheight}%
+  \fi
+  % Calculating the minimal and maximal height
+  \Gscale@div{\@tempa}{\cmdKV@FTBX@maxwidth}{\fitboxnatwidth}%
+  \FTBX@desired@maxheight=\@tempa\fitboxnatheight\relax
+  \expandafter\ifdim\cmdKV@FTBX@maxheight<\FTBX@desired@maxheight\relax
+     \expandafter\FTBX@desired@maxheight=\cmdKV@FTBX@maxheight\relax
+  \fi
+  \Gscale@div{\@tempa}{\cmdKV@FTBX@minwidth}{\fitboxnatwidth}%
+  \FTBX@desired@minheight=\@tempa\fitboxnatheight\relax
+  \expandafter\ifdim\cmdKV@FTBX@minheight>\FTBX@desired@minheight\relax
+     \expandafter\FTBX@desired@minheight=\cmdKV@FTBX@minheight\relax
+  \fi
+  \ifdim\FTBX@desired@minheight>\FTBX@desired@maxheight\relax
+      \PackageWarning{fitbox}{Desired min scale exceeds desired min
+        scale.  Adjusting...}% 
+      \FTBX@desired@minheight=\FTBX@desired@maxheight\relax
+  \fi  
+  \FTBX@available@height=\pagegoal\relax
+  \ifdim\FTBX@available@height>\vsize\relax
+    \FTBX@available@height=\vsize
+  \fi
+  \advance\FTBX@available@height-\pagetotal\relax
+  \advance\FTBX@available@height-\cmdKV@FTBX@belowboxspace\relax
+  \ifdim\FTBX@desired@maxheight>\FTBX@available@height
+     \ifdim\FTBX@available@height<\FTBX@desired@minheight
+        \@tempdima=\FTBX@desired@minheight\relax
+        \advance\@tempdima by
+        -\FTBX@available@height\relax
+        \expandafter\ifdim\cmdKV@FTBX@maxenlargepage<\@tempdima\relax
+          \newpage
+          \resizebox*{!}{\FTBX@desired@maxheight}{\box\FTBX@box}%
+        \else
+          \enlargethispage{\@tempdima}%
+          \resizebox*{!}{\FTBX@desired@minheight}{\box\FTBX@box}%
+        \fi
+      \else
+       \resizebox*{!}{\FTBX@available@height}{\box\FTBX@box}%
+      \fi
+  \else
+     \expandafter
+     \resizebox*{!}{\FTBX@desired@maxheight}{\box\FTBX@box}%
+  \fi
+}
 %    \end{macrocode}
 %   
 % \end{macro}
