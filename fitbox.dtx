@@ -203,8 +203,64 @@
 %    \end{macrocode}
 %
 %
+%\subsection{Setting up parameters}
+%\label{sec:params}
 %
+% 
+%   
+% 
+% \begin{macro}{\fitboxnatheight}
+%   The total height of the box
+%    \begin{macrocode}
+\newdimen\fitboxnatheight
+%    \end{macrocode}
+%   
+% \end{macro}
 %
+% \begin{macro}{\fitboxnatwidth}
+%   The total width of the box
+%    \begin{macrocode}
+\newdimen\fitboxnatwidth
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% 
+%
+% We use |xkeyval| interface:
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\define@cmdkeys{FTBX}{maxheight, minheight, maxwidth, minwidth,
+  belowboxspace, maxenlargepage}
+%    \end{macrocode}
+%
+% \begin{macro}{\fitboxset}
+%   Setting everything
+%    \begin{macrocode}
+\def\fitboxset#1{\setkeys{FTBX}{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% The defaults
+%    \begin{macrocode}
+\fitboxset{maxheight=\textheight, minheight=\fitboxnatheight,
+  maxwidth=\textwidth, minwidth=\fitboxnatwidth,
+  belowboxspace=0pt, maxenlargepage=0pt}
+%    \end{macrocode}
+% 
+%
+%\subsection{Main command}
+%\label{sec:main_command}
+%
+% \begin{macro}{\fitbox}
+%   The main command
+%    \begin{macrocode}
+\newcommand\fitbox[2][]{%
+  \fitboxset{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
 %
 %    \begin{macrocode}
 %</style>
