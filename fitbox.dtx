@@ -280,7 +280,7 @@
 % \begin{macro}{\fitbox}
 %   The main command
 %    \begin{macrocode}
-\newcommand\fitbox[2][]{%
+\newcommand\fitbox[2][]{\leavevmode
   \fitboxset{#1}%
   \setbox\FTBX@box=\hbox{#2}%
   \fitboxnatwidth=\wd\FTBX@box\relax
@@ -329,7 +329,7 @@
   \fi
   \advance\FTBX@available@height by -\pagetotal\relax
   \advance\FTBX@available@height by -\cmdKV@FTBX@belowboxspace\relax
-  \advance\FTBX@available@height by -1pt\relax
+  \advance\FTBX@available@height by -\baselineskip\relax
   \ifdim\FTBX@desired@maxheight>\FTBX@available@height\relax
      \ifdim\FTBX@available@height<\FTBX@desired@minheight\relax 
         \@tempdima=\FTBX@desired@minheight\relax
