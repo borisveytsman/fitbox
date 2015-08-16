@@ -1,0 +1,7 @@
+			Fit graphics on a page
+			    Boris Veytsman
+
+The fitbox package allows a box (usually an \includegraphics box) to
+fit on the page.  It scales the box to the maximal allowed size within
+the user-set limits. If there there is not enough space on the page,
+the box is moved to the next one.
