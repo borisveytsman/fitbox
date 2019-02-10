@@ -1,7 +1,6 @@
 % \iffalse
-% $Id$
 %
-%% Copyright 2015, Boris Veytsman <borisv@lk.net
+%% Copyright 2015-2019, Boris Veytsman <borisv@lk.net
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either
 %% version 1.3 of this license or (at your option) any 
@@ -22,12 +21,11 @@
 %</gobble>
 %<style>\ProvidesPackage{fitbox}
 %<*style>
-[2015/02/02 v1.00 Fitting boxes on a page]
+[2019/02/10 v1.01 Fitting boxes on a page]
 %    \end{macrocode}
 %</style>
 %<*gobble>
 % \fi
-% \CheckSum{188}
 %
 %
 %% \CharacterTable
@@ -177,7 +175,7 @@
 % \item[maxheight:] The maximal total height of the box.  By default
 % \cs{textheight}. 
 % \item[maxwidth:] The maximal width of the box.  By default
-% \cs{textwidth}. 
+% the size of the current box to be constructed. 
 % \item[minheight:] The minimal height of the box.  By default
 % \cs{fitboxnatheight}. 
 % \item[minwidth:] The minimal width of the box.  By default
@@ -242,10 +240,11 @@
 %   
 % \end{macro}
 %
+%\changes{v1.01}{2019/02/10}{Changed maximal width}
 % The defaults
 %    \begin{macrocode}
 \fitboxset{maxheight=\textheight, minheight=\fitboxnatheight,
-  maxwidth=\textwidth, minwidth=\fitboxnatwidth,
+  maxwidth=\hsize, minwidth=\fitboxnatwidth,
   belowboxspace=0pt, maxenlargepage=0pt}
 %    \end{macrocode}
 % 
@@ -278,6 +277,7 @@
 % \end{macro}
 %
 % \begin{macro}{\fitbox}
+%\changes{v1.01}{2019/02/10}{Do not force adjusting the width}
 %   The main command
 %    \begin{macrocode}
 \newcommand\fitbox[2][]{\leavevmode
@@ -288,24 +288,20 @@
   \advance\fitboxnatheight by \dp\FTBX@box\relax
   % Checking the sizes
   \expandafter\ifdim\cmdKV@FTBX@minwidth>\columnwidth\relax
-      \PackageWarning{fitbox}{Minimal width is larger than page
-        width.  Adjusting...}%
-      \def\cmd@KV@FTBX@minwidth{\columnwidth}%
+      \PackageWarning{fitbox}{Minimal width is too large.  Consider
+        changing it to \the\hsize}%
   \fi
-  \expandafter\ifdim\cmdKV@FTBX@maxwidth>\columnwidth\relax
-      \PackageWarning{fitbox}{Desired width is larger than page
-        width.  Adjusting...}%
-      \def\cmd@KV@FTBX@maxwidth{\columnwidth}%
+  \expandafter\ifdim\cmdKV@FTBX@maxwidth>\hsize\relax
+      \PackageWarning{fitbox}{Desired width is too large.  Consider
+        changing it to \the\hsize}%
   \fi
   \expandafter\ifdim\cmdKV@FTBX@minheight>\textheight\relax
-      \PackageWarning{fitbox}{Minimal height is larger than page
-        height.  Adjusting...}%
-      \def\cmd@KV@FTBX@minheight{\textheight}%
+      \PackageWarning{fitbox}{Minimal height is too large.  
+        Consider changing it to \the\textheight}%
   \fi
   \expandafter\ifdim\cmdKV@FTBX@maxheight>\textheight\relax
-      \PackageWarning{fitbox}{Desired height is larger than page
-        height.  Adjusting...}%
-      \def\cmd@KV@FTBX@maxheight{\textheight}%
+      \PackageWarning{fitbox}{Desired height is too laege.
+        Consider changing it to \the\textheight}%
   \fi
   % Calculating the minimal and maximal height
   \Gscale@div{\@tempa}{\cmdKV@FTBX@maxwidth}{\fitboxnatwidth}%
@@ -319,9 +315,8 @@
      \expandafter\FTBX@desired@minheight=\cmdKV@FTBX@minheight\relax
   \fi
   \ifdim\FTBX@desired@minheight>\FTBX@desired@maxheight\relax
-      \PackageWarning{fitbox}{Desired min scale exceeds desired min
-        scale.  Adjusting...}% 
-      \FTBX@desired@minheight=\FTBX@desired@maxheight\relax
+      \PackageWarning{fitbox}{Desired min scale exceeds desired max
+        scale.}% 
   \fi  
   \FTBX@available@height=\pagegoal\relax
   \ifdim\FTBX@available@height>\vsize\relax

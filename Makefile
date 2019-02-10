@@ -53,7 +53,7 @@ distclean: veryclean
 # Archive for the distribution. Includes typeset documentation
 #
 archive:  all clean
-	tar -czvf $(PACKAGE).tgz -C .. --exclude '*~' --exclude '*.tgz' --exclude CVS $(PACKAGE)
+	COPYFILE_DISABLE=1 tar -C .. -czvf ../$(PACKAGE).tgz --exclude '*~' --exclude '*.tgz' --exclude '*.zip'  --exclude CVS --exclude '.git*' $(PACKAGE); mv ../$(PACKAGE).tgz .
 
 zip:  all clean
 	${MAKE} $(PACKAGE).sty
