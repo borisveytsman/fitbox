@@ -6,7 +6,7 @@
 #
 
 PACKAGE=fitbox
-SAMPLES = sample.tex
+SAMPLES = sample.tex sample-subfigure.tex
 
 all:  $(PACKAGE).pdf ${SAMPLES:%.tex=%.pdf} 
 

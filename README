@@ -7,7 +7,10 @@ the user-set limits. If there there is not enough space on the page,
 the box is moved to the next one.
 
 
-version 1.02 2019/02/17   Bug fixes
+version 1.02 2019/02/18   Bug fixes
+	     		  New command \fitbox* for boxes inside floats
+			  New command \SetFitboxLayout for emulation of figsize
+			  package functionality
 
 version 1.01 2019/02/10   Use the width of the box around the graphics for
                           default max width.

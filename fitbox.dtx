@@ -21,7 +21,7 @@
 %</gobble>
 %<style>\ProvidesPackage{fitbox}
 %<*style>
-[2019/02/17 v1.02 Fitting boxes on a page]
+[2019/02/18 v1.02 Fitting boxes on a page]
 %    \end{macrocode}
 %</style>
 %<*gobble>
@@ -147,7 +147,12 @@
 % \item If this also fails, \TeX\ starts a new page and fits the box
 % there.  
 % \end{enumerate}
-% 
+%
+% \DescribeMacro{\fitbox*}%
+% The starred version \cs{fitbox*} is intended to be used inside
+% floats, where page length is not well defined.  This command uses
+% only the first two steps of the alogithm above, scaling the box up
+% to the maximal dimensions provided by the user.
 %
 % \DescribeMacro{\fitboxset}%
 % The options can be set individually for each \cs{fitbox} command, or
@@ -166,7 +171,7 @@
 % \cs{fitboxnatheight} are actually \emph{total heights}, including
 % both height and depth of the corresponding boxes.  For example,
 % \begin{verbatim}
-% \fitboxeset{minheight=0.5\fitboxnatheight}
+% \fitboxset{minheight=0.5\fitboxnatheight}
 % \end{verbatim}
 % means that the box cannot be scaled down more than 50\%.  
 % 
@@ -185,7 +190,23 @@
 % \item[maxenlargepage:] The maximal amount to add to the current
 % page.  By default zero.
 % \end{description}
-% 
+%
+% \DescribeMacro{\SetFitboxLayout}%
+% Since version 1.02 the package added the functionality of
+% \textsl{FigSize} package~\cite{FigSize}.  The latter has a handy
+% command \cs{SetFigLayout}, which can be used to scale all figures on
+% a page.  This package uses the command \cs{SetFitboxLayout} that
+% somewhat mimics \cs{SetFigLayout}.  The macro has the arguments
+% \cs{SetFitboxLayout}\oarg{extra caption
+% lines}\marg{rows}\marg{columns}, and helps to scale the boxes into a
+% grid.  It assumes the figures have captions with the height
+% $n+1$~lines, where $n$ is the optional argument of the command (by
+% default~0).  However, unlike \textsl{FigSize} package, we do not
+% redefine \cs{includegraphics} command: you should use \cs{fitbox}
+% for your graphics.  The command \cs{SetFitboxLayout} is just
+% \cs{fitboxset} with special values of the parameters.  These
+% commands can be mixed, with the latest command overriding the
+% previous ones.
 %
 %\StopEventually{\clearpage
 % \bibliography{fitbox}
@@ -277,12 +298,22 @@
 % \end{macro}
 %
 % \begin{macro}{\fitbox}
+% \changes{v1.02}{2019/02/18}{Split into normal and starred version}
+% The main command
+%    \begin{macrocode}
+\def\fitbox{\@ifstar\@@fitbox\@fitbox}
+%    \end{macrocode}
+% 
+% \end{macro}
+%
+% \begin{macro}{\@fitbox}
 % \changes{v1.01}{2019/02/10}{Do not force width adjustment}
 % \changes{v1.02}{2019/02/17}{\cs{noident} instead of \cs{leavevmode}
 % (suggested by Frank Mittelbach)}
-%   The main command
+% \changes{v1.02}{2019/02/18}{Split into normal and starred version}
+%   The main command---``normal'' version
 %    \begin{macrocode}
-\newcommand\fitbox[2][]{\noindent
+\newcommand\@fitbox[2][]{\noindent
   \fitboxset{#1}%
   \setbox\FTBX@box=\hbox{#2}%
   \fitboxnatwidth=\wd\FTBX@box\relax
@@ -302,17 +333,17 @@
         Consider changing it to \the\textheight}%
   \fi
   \expandafter\ifdim\cmdKV@FTBX@maxheight>\textheight\relax
-      \PackageWarning{fitbox}{Desired height is too laege.
+      \PackageWarning{fitbox}{Desired height is too large.
         Consider changing it to \the\textheight}%
   \fi
   % Calculating the minimal and maximal height
-  \Gscale@div{\@tempa}{\cmdKV@FTBX@maxwidth}{\fitboxnatwidth}%
-  \FTBX@desired@maxheight=\@tempa\fitboxnatheight\relax
+  \Gscale@div{\@FTBX@tempa}{\cmdKV@FTBX@maxwidth}{\fitboxnatwidth}%
+  \FTBX@desired@maxheight=\@FTBX@tempa\fitboxnatheight\relax
   \expandafter\ifdim\cmdKV@FTBX@maxheight<\FTBX@desired@maxheight\relax
      \expandafter\FTBX@desired@maxheight=\cmdKV@FTBX@maxheight\relax
   \fi
-  \Gscale@div{\@tempa}{\cmdKV@FTBX@minwidth}{\fitboxnatwidth}%
-  \FTBX@desired@minheight=\@tempa\fitboxnatheight\relax
+  \Gscale@div{\@FTBX@tempa}{\cmdKV@FTBX@minwidth}{\fitboxnatwidth}%
+  \FTBX@desired@minheight=\@FTBX@tempa\fitboxnatheight\relax
   \expandafter\ifdim\cmdKV@FTBX@minheight>\FTBX@desired@minheight\relax
      \expandafter\FTBX@desired@minheight=\cmdKV@FTBX@minheight\relax
   \fi
@@ -348,6 +379,86 @@
 }
 %    \end{macrocode}
 %   
+% \end{macro}
+%
+% \begin{macro}{\@@fitbox}
+% \changes{v1.01}{2019/02/10}{Do not force width adjustment}
+% \changes{v1.02}{2019/02/17}{\cs{noident} instead of \cs{leavevmode}
+% (suggested by Frank Mittelbach)}
+% \changes{v1.02}{2019/02/18}{Split into normal and starred version}
+%   The main command---``starred'' version.  Simplified computations.
+%    \begin{macrocode}
+\newcommand\@@fitbox[2][]{\noindent
+  \fitboxset{#1}%
+  \setbox\FTBX@box=\hbox{#2}%
+  \fitboxnatwidth=\wd\FTBX@box\relax
+  \fitboxnatheight=\ht\FTBX@box\relax
+  \advance\fitboxnatheight by \dp\FTBX@box\relax
+  % Checking the sizes
+  \expandafter\ifdim\cmdKV@FTBX@minwidth>\columnwidth\relax
+      \PackageWarning{fitbox}{Minimal width is too large.  Consider
+        changing it to \the\hsize}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@maxwidth>\hsize\relax
+      \PackageWarning{fitbox}{Desired width is too large.  Consider
+        changing it to \the\hsize}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@minheight>\textheight\relax
+      \PackageWarning{fitbox}{Minimal height is too large.  
+        Consider changing it to \the\textheight}%
+  \fi
+  \expandafter\ifdim\cmdKV@FTBX@maxheight>\textheight\relax
+      \PackageWarning{fitbox}{Desired height is too large.
+        Consider changing it to \the\textheight}%
+  \fi
+  % Calculating the minimal and maximal height
+  \Gscale@div{\@FTBX@tempa}{\cmdKV@FTBX@maxwidth}{\fitboxnatwidth}%
+  \FTBX@desired@maxheight=\@FTBX@tempa\fitboxnatheight\relax
+  \expandafter\ifdim\cmdKV@FTBX@maxheight<\FTBX@desired@maxheight\relax
+     \expandafter\FTBX@desired@maxheight=\cmdKV@FTBX@maxheight\relax
+  \fi
+  \Gscale@div{\@FTBX@tempa}{\cmdKV@FTBX@minwidth}{\fitboxnatwidth}%
+  \FTBX@desired@minheight=\@FTBX@tempa\fitboxnatheight\relax
+  \expandafter\ifdim\cmdKV@FTBX@minheight>\FTBX@desired@minheight\relax
+     \expandafter\FTBX@desired@minheight=\cmdKV@FTBX@minheight\relax
+  \fi
+  \ifdim\FTBX@desired@minheight>\FTBX@desired@maxheight\relax
+      \PackageWarning{fitbox}{Desired min scale exceeds desired max
+        scale.}% 
+  \fi  
+  \resizebox*{!}{\FTBX@desired@maxheight}{\box\FTBX@box}%
+}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+% \begin{macro}{\SetFitboxLayout}
+% \changes{v1.02}{2019/02/17}{New macro}
+% A macro styles after \cs{SetFigsizeLayout} of \textsl{FigSize}
+% package.
+%    \begin{macrocode}
+\newcommand\SetFitboxLayout[3][0]{%
+  \@tempdima=\textheight
+  \advance\@tempdima by -\baselineskip\relax
+  \advance\@tempdima by -\parskip\relax
+  \advance\@tempdima by -\abovecaptionskip
+  \advance\@tempdima by -\belowcaptionskip
+  \divide\@tempdima by #2\relax
+  \@tempdimb=-\baselineskip\relax
+  \advance\@tempdimb by -\parskip\relax
+  \advance\@tempdimb by -\abovecaptionskip
+  \advance\@tempdimb by -\belowcaptionskip
+  \multiply\@tempdimb by #1\relax
+  \advance\@tempdima by \@tempdimb\relax
+  \edef\cmdKV@FTBX@maxheight{\the\@tempdima}%
+  \@tempdima=\textwidth
+  \ifnum#3>1\relax\@tempdima=0.95\@tempdima\fi
+  \divide\@tempdima by #3\relax
+  \edef\cmdKV@FTBX@maxwidth{\the\@tempdima}%
+}
+%    \end{macrocode}
+% 
 % \end{macro}
 %
 %    \begin{macrocode}
