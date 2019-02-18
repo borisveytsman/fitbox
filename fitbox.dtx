@@ -21,7 +21,7 @@
 %</gobble>
 %<style>\ProvidesPackage{fitbox}
 %<*style>
-[2019/02/10 v1.01 Fitting boxes on a page]
+[2019/02/17 v1.02 Fitting boxes on a page]
 %    \end{macrocode}
 %</style>
 %<*gobble>
@@ -277,10 +277,12 @@
 % \end{macro}
 %
 % \begin{macro}{\fitbox}
-%\changes{v1.01}{2019/02/10}{Do not force adjusting the width}
+% \changes{v1.01}{2019/02/10}{Do not force width adjustment}
+% \changes{v1.02}{2019/02/17}{\cs{noident} instead of \cs{leavevmode}
+% (suggested by Frank Mittelbach)}
 %   The main command
 %    \begin{macrocode}
-\newcommand\fitbox[2][]{\leavevmode
+\newcommand\fitbox[2][]{\noindent
   \fitboxset{#1}%
   \setbox\FTBX@box=\hbox{#2}%
   \fitboxnatwidth=\wd\FTBX@box\relax
