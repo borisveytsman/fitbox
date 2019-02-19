@@ -445,15 +445,13 @@
   \advance\@tempdima by -\abovecaptionskip
   \advance\@tempdima by -\belowcaptionskip
   \divide\@tempdima by #2\relax
-  \@tempdimb=-\baselineskip\relax
-  \advance\@tempdimb by -\parskip\relax
-  \advance\@tempdimb by -\abovecaptionskip
-  \advance\@tempdimb by -\belowcaptionskip
-  \multiply\@tempdimb by #1\relax
-  \advance\@tempdima by \@tempdimb\relax
+  \advance\@tempdima by -#1\baselineskip
+  \advance\@tempdima by -\parskip\relax
+  \advance\@tempdima by -\abovecaptionskip
+  \advance\@tempdima by -\belowcaptionskip
   \edef\cmdKV@FTBX@maxheight{\the\@tempdima}%
   \@tempdima=\textwidth
-  \ifnum#3>1\relax\@tempdima=0.95\@tempdima\fi
+  \ifnum#3>1\relax\@tempdima=0.9\@tempdima\fi
   \divide\@tempdima by #3\relax
   \edef\cmdKV@FTBX@maxwidth{\the\@tempdima}%
 }
