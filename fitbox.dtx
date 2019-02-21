@@ -21,7 +21,7 @@
 %</gobble>
 %<style>\ProvidesPackage{fitbox}
 %<*style>
-[2019/02/18 v1.02 Fitting boxes on a page]
+[2019/02/20 v1.02 Fitting boxes on a page]
 %    \end{macrocode}
 %</style>
 %<*gobble>
@@ -62,7 +62,7 @@
 % \GetFileInfo{fitbox.dtx}
 % 
 % 
-% \title{Fit graphics on a page\thanks{\copyright 2015 Boris Veytsman}
+% \title{Fit graphics on a page\thanks{\copyright 2015--2019 Boris Veytsman}
 % \thanks{This package was commissined by Neadwerx, \url{http://www.neadwerx.com/}}}
 % \author{Boris Veytsman \thanks{borisv@lk.net}}
 % \date{\filedate, \fileversion}
@@ -175,7 +175,7 @@
 % \end{verbatim}
 % means that the box cannot be scaled down more than 50\%.  
 % 
-% The following options are recognized:
+% The following options are recognized by the \cs{fitbox} command:
 % \begin{description}
 % \item[maxheight:] The maximal total height of the box.  By default
 % \cs{textheight}. 
@@ -197,16 +197,36 @@
 % command \cs{SetFigLayout}, which can be used to scale all figures on
 % a page.  This package uses the command \cs{SetFitboxLayout} that
 % somewhat mimics \cs{SetFigLayout}.  The macro has the arguments
-% \cs{SetFitboxLayout}\oarg{extra caption
-% lines}\marg{rows}\marg{columns}, and helps to scale the boxes into a
-% grid.  It assumes the figures have captions with the height
-% $n+1$~lines, where $n$ is the optional argument of the command (by
-% default~0).  However, unlike \textsl{FigSize} package, we do not
-% redefine \cs{includegraphics} command: you should use \cs{fitbox}
-% for your graphics.  The command \cs{SetFitboxLayout} is just
-% \cs{fitboxset} with special values of the parameters.  These
+% \cs{SetFitboxLayout}\oarg{keys}\marg{rows}\marg{columns}, and helps
+% to scale the boxes into a grid.  However, unlike \textsl{FigSize}
+% package, we do not redefine \cs{includegraphics} command: you should
+% use \cs{fitbox} for your graphics.  The command \cs{SetFitboxLayout}
+% is just \cs{fitboxset} with special values of the parameters.  These
 % commands can be mixed, with the latest command overriding the
 % previous ones.
+%
+% The following keys are recognized by the \cs{SetFitboxLayout} command:
+% \begin{description}
+% \item[colsep:] the distance between the columns; by default the size
+% of \cs{quad}.
+% \item[colsepexpr:] if set, the width of the expression becomes
+% \texttt{colsep}.  For example, \path{colsepexpr=\quad} makes
+% separation between the columns the size of \cs{quad}.
+% \item[maincapheight:] The height of the main caption.  By default,
+% $\cs{abovecaptionskip}+\cs{belowcaptionskip}+
+% n\cs{baselineskip})$ 
+% where $n$ is the expected number of lines in the main caption (by
+% default 1).
+% \item[maincaplines:] The number of lines in the main caption.  By
+% default 1.
+% \item[subcapheight:] The height of the subcaption.  By default,
+%   $\cs{abovecaptionskip}+\cs{belowcaptionskip}+m\cs{baselineskip}$
+%   where $m$ is the expected number of lines in the subcaptions (by
+%   default 0).
+% \item[subcaplines:] The number of lines in the subcaptions.  By
+% default 0.
+% \end{description}
+% 
 %
 %\StopEventually{\clearpage
 % \bibliography{fitbox}
@@ -245,13 +265,40 @@
 % \end{macro}
 %
 % 
-%
+% \changes{v1.01}{2019/02/20}{New keys for \cs{SetFitboxLayout}}
 % We use |xkeyval| interface:
 %    \begin{macrocode}
 \RequirePackage{xkeyval}
 \define@cmdkeys{FTBX}{maxheight, minheight, maxwidth, minwidth,
-  belowboxspace, maxenlargepage}
+  belowboxspace, maxenlargepage, colsep, maincapheight,
+  subcapheight}
 %    \end{macrocode}
+%
+% Setting some keys changes other keys
+%    \begin{macrocode}
+\define@key{FTBX}{colsepexpr}{%
+  \setbox\@tempboxa=\hbox{#1}%
+  \edef\cmdKV@FTBX@colsep{\wd\@tempboxa}}
+\define@key{FTBX}{maincaplines}{%
+  \@tempdima=\z@
+  \advance\@tempdima by #1\baselineskip\relax
+  \ifnum#1>0\relax
+     \advance\@tempdima by \parskip
+  \fi 
+  \advance\@tempdima by \abovecaptionskip
+  \advance\@tempdima by \belowcaptionskip
+  \edef\cmdKV@FTBX@maincapheight{\the\@tempdima}}
+\define@key{FTBX}{subcaplines}{%
+  \@tempdima=\z@
+  \advance\@tempdima by #1\baselineskip\relax
+  \ifnum#1>0\relax
+     \advance\@tempdima by \parskip
+  \fi 
+  \advance\@tempdima by \abovecaptionskip
+  \advance\@tempdima by \belowcaptionskip
+  \edef\cmdKV@FTBX@subcapheight{\the\@tempdima}}  
+%    \end{macrocode}
+% 
 %
 % \begin{macro}{\fitboxset}
 %   Setting everything
@@ -266,7 +313,8 @@
 %    \begin{macrocode}
 \fitboxset{maxheight=\textheight, minheight=\fitboxnatheight,
   maxwidth=\hsize, minwidth=\fitboxnatwidth,
-  belowboxspace=0pt, maxenlargepage=0pt}
+  belowboxspace=0pt, maxenlargepage=0pt, colsepexpr={aaa},
+  maincaplines=1, subcaplines=0}
 %    \end{macrocode}
 % 
 %
@@ -283,18 +331,24 @@
 %
 % \begin{macro}{\FTBX@desired@maxheight}
 %   The desired maximal height
+%    \begin{macrocode}
 \newdimen\FTBX@desired@maxheight
+%    \end{macrocode}
 % \end{macro}
 %
 %
 % \begin{macro}{\FTBX@desired@minheight}
-%   The desired minimal height
+% The desired minimal height
+%    \begin{macrocode}
 \newdimen\FTBX@desired@minheight
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\FTBX@available@height}
-%   The desired available height
+% The desired available height
+%    \begin{macrocode}
 \newdimen\FTBX@available@height
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\fitbox}
@@ -433,25 +487,28 @@
 % \end{macro}
 %
 %
+%\subsection{Multi-figure layout}
+%\label{sec:layout}
+%
+%
+%
 % \begin{macro}{\SetFitboxLayout}
 % \changes{v1.02}{2019/02/17}{New macro}
+% \changes{v1.02}{2019/02/20}{Key-value interface}
 % A macro styles after \cs{SetFigsizeLayout} of \textsl{FigSize}
 % package.
 %    \begin{macrocode}
-\newcommand\SetFitboxLayout[3][0]{%
+\newcommand\SetFitboxLayout[3][]{%
+  \fitboxset{#1}%
   \@tempdima=\textheight
-  \advance\@tempdima by -\baselineskip\relax
-  \advance\@tempdima by -\parskip\relax
-  \advance\@tempdima by -\abovecaptionskip
-  \advance\@tempdima by -\belowcaptionskip
+  \advance\@tempdima by -\cmdKV@FTBX@maincapheight\relax
   \divide\@tempdima by #2\relax
-  \advance\@tempdima by -#1\baselineskip
-  \advance\@tempdima by -\parskip\relax
-  \advance\@tempdima by -\abovecaptionskip
-  \advance\@tempdima by -\belowcaptionskip
+  \advance\@tempdima by -\cmdKV@FTBX@subcapheight\relax
   \edef\cmdKV@FTBX@maxheight{\the\@tempdima}%
   \@tempdima=\textwidth
-  \ifnum#3>1\relax\@tempdima=0.9\@tempdima\fi
+  \@tempdimb=\cmdKV@FTBX@colsep\relax
+  \advance\@tempdima by -#3\@tempdimb\relax
+  \advance\@tempdima by \@tempdimb\relax
   \divide\@tempdima by #3\relax
   \edef\cmdKV@FTBX@maxwidth{\the\@tempdima}%
 }
